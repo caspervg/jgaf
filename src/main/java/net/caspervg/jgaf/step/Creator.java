@@ -6,5 +6,5 @@ import net.caspervg.jgaf.Organism;
 import java.util.List;
 
 public interface Creator {
-    List<Organism> create(Arguments arguments);
+    <O extends Organism> List<O> create(Arguments arguments);
 }

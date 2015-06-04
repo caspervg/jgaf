@@ -2,11 +2,11 @@ package net.caspervg.jgaf;
 
 public interface Arguments {
 
-    default long populationSize() {
-        return 1000L;
+    default int populationSize() {
+        return 1000;
     }
 
-    default long numIterations() {
+    default int numIterations() {
         return 1000;
     }
 
@@ -14,15 +14,15 @@ public interface Arguments {
         return 0.1D;
     }
 
-    default long breedingPoolSize() {
+    default int breedingPoolSize() {
         return populationSize() / 10;
     }
 
-    default long tradingPoolSize() {
+    default int tradingPoolSize() {
         return breedingPoolSize() / 2;
     }
 
-    default long killingPoolSize() {
+    default int killingPoolSize() {
         return breedingPoolSize();
     }
 

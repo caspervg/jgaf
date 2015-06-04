@@ -8,46 +8,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public interface Breeder {
+public interface Killer {
 
-    <O extends Organism> List<Integer> select(Arguments arguments, List<O> population);
+    <O extends Organism> List<O> select(Arguments arguments, List<O> population);
 
-    <O extends Organism> List<O> breed(Arguments arguments, List<O> population, List<Integer> selected);
+    <O extends Organism> void kill(Arguments arguments, List<O> population, List<O> selected);
 
-    default <O extends Organism> List<O> breed(Arguments arguments, List<O> population) {
-        List<Integer> selected = select(arguments, population);
-        return breed(arguments, population, selected);
+    default <O extends Organism> void kill(Arguments arguments, List<O> population) {
+        List<O> selected = select(arguments, population);
+        kill(arguments, population, selected);
     }
 
-    class Default implements Breeder {
+    class Default implements Killer {
 
-        private Crosser crosser;
-
-        private Default() {
-            // We need an instance responsible for the actual crossover
-        }
-
-        public Default(Crosser crosser) {
-            this.crosser = crosser;
+        @Override
+        public <O extends Organism> void kill(Arguments arguments, List<O> population, List<O> selected) {
+            population.removeAll(selected);
         }
 
         @Override
-        public <O extends Organism> List<O> breed(Arguments arguments, List<O> population, List<Integer> selected) {
-            List<O> bred = new ArrayList<>();
-
-            for (int i = 0; i < arguments.breedingPoolSize(); i+=2) {
-                O father = population.get(selected.get(i));
-                O mother = population.get(selected.get(i+1));
-
-                List<O> children = crosser.cross(father, mother);
-                bred.addAll(children);
-            }
-
-            return bred;
-        }
-
-        @Override
-        public <O extends Organism> List<Integer> select(Arguments arguments, List<O> population) {
+        public <O extends Organism> List<O> select(Arguments arguments, List<O> population) {
             double totalFitness = 0, accumulated = 0;
             int numSelected = 0;
 
@@ -73,14 +53,14 @@ public interface Breeder {
                 ));
             }
 
-            List<Integer> selected = new ArrayList<>(arguments.breedingPoolSize());
+            List<O> selected = new ArrayList<>(arguments.killingPoolSize());
             Random random = new Random();
-            while (numSelected < arguments.breedingPoolSize()) {
-                double cutOff = random.nextDouble() * selections.get(selections.size() - 1).getAccumulatedFitness();
+            while (numSelected < arguments.killingPoolSize()) {
+                double cutOff = random.nextDouble() * selections.get(0).getAccumulatedFitness();
 
                 for (int i = 0; i < population.size(); i++) {
                     if (selections.get(i).getAccumulatedFitness() > cutOff) {
-                        selected.add(selections.get(i).getIndex());
+                        selected.add(population.get(selections.get(i).getIndex()));
                         selections.set(i, new SelectionItem(
                                 selections.get(i),
                                 -1.0D
@@ -127,8 +107,7 @@ public interface Breeder {
 
         @Override
         public int compareTo(@NotNull SelectionItem selectionItem) {
-            return Double.compare(getNormalizedFitness(), selectionItem.getNormalizedFitness());
+            return -Double.compare(getNormalizedFitness(), selectionItem.getNormalizedFitness());
         }
     }
-
 }

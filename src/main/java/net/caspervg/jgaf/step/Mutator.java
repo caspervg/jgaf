@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public interface Mutator {
-    Organism mutate(Arguments arguments, Organism child);
+    <O extends Organism> O mutate(Arguments arguments, O child);
 
-    default List<Organism> mutate(Arguments arguments, List<Organism> children) {
+    default <O extends Organism> List<O> mutate(Arguments arguments, List<O> children) {
         return children.stream().map(child -> mutate(arguments, child)).collect(Collectors.toList());
     }
 }
