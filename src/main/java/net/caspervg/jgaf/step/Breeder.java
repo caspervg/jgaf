@@ -91,8 +91,11 @@ public interface Breeder<O> {
             for (int i = 0; i < arguments.breedingPoolSize(); i+=2) {
                 O father = population.get(selected.get(i));
                 O mother = population.get(selected.get(i+1));
+                List<O> parents = new ArrayList<>();
+                parents.add(father);
+                parents.add(mother);
 
-                List<O> children = crosser.cross(father, mother);
+                List<O> children = crosser.cross(parents);
                 bred.addAll(children);
             }
 
