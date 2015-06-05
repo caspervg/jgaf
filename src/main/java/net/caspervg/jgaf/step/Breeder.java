@@ -55,19 +55,19 @@ public interface Breeder {
                 totalFitness += o.fitness().doubleValue();
             }
 
-            List<SelectionItem> selections = new ArrayList<>(population.size());
+            List<BreederSelectionItem> selections = new ArrayList<>(population.size());
             for (int i = 0; i < population.size(); i++) {
-                selections.add(new SelectionItem(
+                selections.add(new BreederSelectionItem(
                         i,
                         population.get(i).fitness().doubleValue() / totalFitness
                 ));
             }
 
-            selections.sort(SelectionItem::compareTo);
+            selections.sort(BreederSelectionItem::compareTo);
 
             for (int i = 0; i < population.size(); i++) {
                 accumulated += selections.get(i).getNormalizedFitness();
-                selections.set(i, new SelectionItem(
+                selections.set(i, new BreederSelectionItem(
                         selections.get(i),
                         accumulated
                 ));
@@ -81,7 +81,7 @@ public interface Breeder {
                 for (int i = 0; i < population.size(); i++) {
                     if (selections.get(i).getAccumulatedFitness() > cutOff) {
                         selected.add(selections.get(i).getIndex());
-                        selections.set(i, new SelectionItem(
+                        selections.set(i, new BreederSelectionItem(
                                 selections.get(i),
                                 -1.0D
                         ));
@@ -96,37 +96,17 @@ public interface Breeder {
         }
     }
 
-    class SelectionItem implements Comparable<SelectionItem> {
-        int index;
-        double normalizedFitness;
-        double accumulatedFitness;
-
-        SelectionItem(int index, double normalizedFitness) {
-            this.index = index;
-            this.normalizedFitness = normalizedFitness;
-            this.accumulatedFitness = -1;
+    class BreederSelectionItem extends SelectionItem implements Comparable<BreederSelectionItem> {
+        BreederSelectionItem(int index, double normalizedFitness) {
+            super(index, normalizedFitness);
         }
 
-        SelectionItem(SelectionItem old, double accumulatedFitness) {
-            this.index = old.index;
-            this.normalizedFitness = old.normalizedFitness;
-            this.accumulatedFitness = accumulatedFitness;
-        }
-
-        int getIndex() {
-            return index;
-        }
-
-        double getNormalizedFitness() {
-            return normalizedFitness;
-        }
-
-        double getAccumulatedFitness() {
-            return accumulatedFitness;
+        BreederSelectionItem(BreederSelectionItem old, double accumulatedFitness) {
+            super(old, accumulatedFitness);
         }
 
         @Override
-        public int compareTo(@NotNull SelectionItem selectionItem) {
+        public int compareTo(@NotNull BreederSelectionItem selectionItem) {
             return Double.compare(getNormalizedFitness(), selectionItem.getNormalizedFitness());
         }
     }

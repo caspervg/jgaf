@@ -35,19 +35,19 @@ public interface Killer {
                 totalFitness += o.fitness().doubleValue();
             }
 
-            List<SelectionItem> selections = new ArrayList<>(population.size());
+            List<KillerSelectionItem> selections = new ArrayList<>(population.size());
             for (int i = 0; i < population.size(); i++) {
-                selections.add(new SelectionItem(
+                selections.add(new KillerSelectionItem(
                         i,
                         population.get(i).fitness().doubleValue() / totalFitness
                 ));
             }
 
-            selections.sort(SelectionItem::compareTo);
+            selections.sort(KillerSelectionItem::compareTo);
 
             for (int i = 0; i < population.size(); i++) {
                 accumulated += selections.get(i).getNormalizedFitness();
-                selections.set(i, new SelectionItem(
+                selections.set(i, new KillerSelectionItem(
                         selections.get(i),
                         accumulated
                 ));
@@ -61,7 +61,7 @@ public interface Killer {
                 for (int i = 0; i < population.size(); i++) {
                     if (selections.get(i).getAccumulatedFitness() > cutOff) {
                         selected.add(population.get(selections.get(i).getIndex()));
-                        selections.set(i, new SelectionItem(
+                        selections.set(i, new KillerSelectionItem(
                                 selections.get(i),
                                 -1.0D
                         ));
@@ -76,37 +76,18 @@ public interface Killer {
         }
     }
 
-    class SelectionItem implements Comparable<SelectionItem> {
-        int index;
-        double normalizedFitness;
-        double accumulatedFitness;
+    class KillerSelectionItem extends SelectionItem implements Comparable<KillerSelectionItem> {
 
-        SelectionItem(int index, double normalizedFitness) {
-            this.index = index;
-            this.normalizedFitness = normalizedFitness;
-            this.accumulatedFitness = -1;
+        KillerSelectionItem(int index, double normalizedFitness) {
+            super(index, normalizedFitness);
         }
 
-        SelectionItem(SelectionItem old, double accumulatedFitness) {
-            this.index = old.index;
-            this.normalizedFitness = old.normalizedFitness;
-            this.accumulatedFitness = accumulatedFitness;
-        }
-
-        int getIndex() {
-            return index;
-        }
-
-        double getNormalizedFitness() {
-            return normalizedFitness;
-        }
-
-        double getAccumulatedFitness() {
-            return accumulatedFitness;
+        KillerSelectionItem(KillerSelectionItem old, double accumulatedFitness) {
+            super(old, accumulatedFitness);
         }
 
         @Override
-        public int compareTo(@NotNull SelectionItem selectionItem) {
+        public int compareTo(@NotNull KillerSelectionItem selectionItem) {
             return -Double.compare(getNormalizedFitness(), selectionItem.getNormalizedFitness());
         }
     }
