@@ -1,6 +1,6 @@
 package net.caspervg.jgaf.step;
 
-public abstract class SelectionItem {
+abstract class SelectionItem {
     int index;
     double normalizedFitness;
     double accumulatedFitness;

@@ -7,17 +7,50 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Provides a way to breed (a part of) the population based on given arguments
+ *
+ * @param <O> Type of the organism
+ */
 public interface Breeder<O> {
 
+    /**
+     * Selects the indices of organisms in the population that should be bred
+     *
+     * @param arguments Arguments to use
+     * @param population Population to select from
+     * @return List of indices of organisms to breed
+     */
     List<Integer> select(Arguments arguments, List<O> population);
 
+    /**
+     * Breeds the selected individuals
+     *
+     * @param arguments Arguments to use
+     * @param population Population to breed from
+     * @param selected Indices of organisms in the population to breed
+     * @return List of children
+     */
     List<O> breed(Arguments arguments, List<O> population, List<Integer> selected);
 
+    /**
+     * Selects the individuals to breed using {@link #select(Arguments, List)}, then breeds
+     * them using {@link #breed(Arguments, List, List)}
+     *
+     * @param arguments Arguments to use
+     * @param population Population to select and breed from
+     * @return List of children
+     */
     default List<O> breed(Arguments arguments, List<O> population) {
         List<Integer> selected = select(arguments, population);
         return breed(arguments, population, selected);
     }
 
+    /**
+     * Default implementation of a {@link Breeder}
+     *
+     * @param <O> Type of the organism
+     */
     class Default<O> implements Breeder<O> {
 
         private Crosser<O> crosser;
@@ -27,11 +60,30 @@ public interface Breeder<O> {
             // We need a fitter and a crosser
         }
 
+        /**
+         * Creates a new default Breeder that will use given Crosser and Fitter in the breeding process
+         *
+         * @param crosser Crosser to use for breeding
+         * @param fitter Fitter to use for breeding
+         */
         public Default(Crosser<O> crosser, Fitter<O> fitter) {
             this.crosser = crosser;
             this.fitter = fitter;
         }
 
+        /**
+         * {@inheritDoc}
+         * <p>
+         *     This implementation loops over the selection list and breeds pairs
+         *     of organisms from it. For breeding, it uses the {@link Crosser} that was
+         *     supplied in the constructor.
+         * </p>
+         *
+         * @param arguments {@inheritDoc}
+         * @param population {@inheritDoc}
+         * @param selected {@inheritDoc}
+         * @return {@inheritDoc}
+         */
         @Override
         public List<O> breed(Arguments arguments, List<O> population, List<Integer> selected) {
             List<O> bred = new ArrayList<>();
@@ -47,6 +99,19 @@ public interface Breeder<O> {
             return bred;
         }
 
+        /**
+         * {@inheritDoc}
+         * <p>
+         *     This implementation uses a basic <b>fitness proportionate selection</b> (also known as
+         *     <b>roulette-wheel selection</b> to select the organisms for breeding. For more information
+         *     about this algorithm, read <a href='http://en.wikipedia.org/wiki/Selection_%28genetic_algorithm%29'>this
+         *     Wikipedia article</a>
+         * </p>
+         *
+         * @param arguments {@inheritDoc}
+         * @param population {@inheritDoc}
+         * @return {@inheritDoc}
+         */
         @Override
         public List<Integer> select(Arguments arguments, List<O> population) {
             double totalFitness = 0, accumulated = 0;

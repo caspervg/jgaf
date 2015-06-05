@@ -6,7 +6,7 @@
 
     <groupId>net.caspervg.jgaf</groupId>
     <artifactId>jgaf</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
 
     <name>JGAF</name>
     <description>A framework for easy development and usage of genetic algorithms</description>
