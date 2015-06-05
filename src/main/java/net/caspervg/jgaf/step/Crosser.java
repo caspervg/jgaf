@@ -11,11 +11,9 @@ public interface Crosser<O> {
 
     /**
      * Performs a crossover between a number of parents to create children.
-     * It allows using any number of parents using a variable arguments array.
      *
-     * @param parents Variable-arguments array for the parents
+     * @param parents List of parents to use
      * @return List of created children
      */
-    @SuppressWarnings("unchecked")
-    List<O> cross(O... parents);
+    List<O> cross(List<O> parents);
 }
