@@ -33,7 +33,7 @@
     <scm>
         <connection>scm:git:git@github.com:caspervg/jgaf.git</connection>
         <developerConnection>scm:git:git@github.com:caspervg/jgaf.git</developerConnection>
-        <url>git@github.com:caspervg/jgaf.git</url>
+        <url>https://github.com/caspervg/jgaf</url>
     </scm>
 
     <dependencies>
@@ -63,7 +63,18 @@
 
     <properties>
         <jdk.level>1.8</jdk.level>
+        <github.global.server>github</github.global.server>
     </properties>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
+            </plugin>
+        </plugins>
+    </reporting>
 
     <profiles>
         <profile>
@@ -85,6 +96,22 @@
             <id>release</id>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>com.github.github</groupId>
+                        <artifactId>site-maven-plugin</artifactId>
+                        <version>0.11</version>
+                        <configuration>
+                            <message>Creating site for ${project.version}</message>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>site</goal>
+                                </goals>
+                                <phase>site</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <version>3.0</version>
@@ -148,5 +175,4 @@
             </build>
         </profile>
     </profiles>
-
 </project>
