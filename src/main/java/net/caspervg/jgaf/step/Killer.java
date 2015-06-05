@@ -20,13 +20,13 @@ public interface Killer<O> {
 
     class Default<O> implements Killer<O> {
 
-        private Fitter fitter;
+        private Fitter<O> fitter;
 
         private Default() {
             // We need a fitter
         }
 
-        public Default(Fitter fitter) {
+        public Default(Fitter<O> fitter) {
             this.fitter = fitter;
         }
 
