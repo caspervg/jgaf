@@ -176,7 +176,7 @@ public interface Breeder<O> {
 
         @Override
         public int compareTo(@NotNull BreederSelectionItem selectionItem) {
-            return Double.compare(getNormalizedFitness(), selectionItem.getNormalizedFitness());
+            return -Double.compare(getNormalizedFitness(), selectionItem.getNormalizedFitness());
         }
     }
 

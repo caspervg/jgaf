@@ -160,7 +160,7 @@ public interface Killer<O> {
 
         @Override
         public int compareTo(@NotNull KillerSelectionItem selectionItem) {
-            return -Double.compare(getNormalizedFitness(), selectionItem.getNormalizedFitness());
+            return Double.compare(getNormalizedFitness(), selectionItem.getNormalizedFitness());
         }
     }
 }
