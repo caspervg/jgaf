@@ -65,6 +65,8 @@ public interface GeneticAlgorithm<O> {
                 population.addAll(children);
 
                 provider.killer().kill(arguments, population);
+
+                iterations++;
             }
 
             FitnessComparator<O> comparator = new FitnessComparator<>(provider.fitter());
