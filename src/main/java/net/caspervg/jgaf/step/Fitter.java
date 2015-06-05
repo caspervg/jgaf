@@ -1,7 +1,5 @@
 package net.caspervg.jgaf.step;
 
-import net.caspervg.jgaf.Organism;
-
-public interface Fitter {
-    <O extends Organism> double calculate(O organism);
+public interface Fitter<O> {
+    <N extends Number> N calculate(O organism);
 }

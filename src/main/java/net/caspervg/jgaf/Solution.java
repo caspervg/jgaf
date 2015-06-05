@@ -2,7 +2,7 @@ package net.caspervg.jgaf;
 
 import java.util.List;
 
-public class Solution<O extends Organism> {
+public class Solution<O> {
     Number bestFitness;
     O bestOrganism;
     List<O> finalPopulation;

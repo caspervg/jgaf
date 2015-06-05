@@ -1,17 +1,17 @@
 package net.caspervg.jgaf;
 
+import net.caspervg.jgaf.util.FitnessComparator;
 import net.caspervg.jgaf.step.StepProvider;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface GeneticAlgorithm<O extends Organism> {
+public interface GeneticAlgorithm<O> {
 
-    Solution<O> run(Arguments arguments, StepProvider provider);
+    Solution<O> run(Arguments arguments, StepProvider<O> provider);
 
-    class Default<O extends Organism> implements GeneticAlgorithm<O> {
+    class Default<O> implements GeneticAlgorithm<O> {
         @Override
-        public Solution<O> run(Arguments arguments, StepProvider provider) {
+        public Solution<O> run(Arguments arguments, StepProvider<O> provider) {
             int iterations = 0;
             List<O> population = provider.creator().create(arguments);
 
@@ -24,8 +24,9 @@ public interface GeneticAlgorithm<O extends Organism> {
                 provider.killer().kill(arguments, population);
             }
 
-            O bestOrganism = population.stream().max(Organism::compare).get();
-            Number bestFitness = bestOrganism.fitness();
+            FitnessComparator<O> comparator = new FitnessComparator<>(provider.fitter());
+            O bestOrganism = population.stream().max(comparator).get();
+            Number bestFitness = provider.fitter().calculate(bestOrganism);
             return new Solution<>(
                     bestFitness,
                     bestOrganism,

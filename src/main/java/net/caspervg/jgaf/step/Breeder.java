@@ -1,38 +1,39 @@
 package net.caspervg.jgaf.step;
 
 import net.caspervg.jgaf.Arguments;
-import net.caspervg.jgaf.Organism;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public interface Breeder {
+public interface Breeder<O> {
 
-    <O extends Organism> List<Integer> select(Arguments arguments, List<O> population);
+    List<Integer> select(Arguments arguments, List<O> population);
 
-    <O extends Organism> List<O> breed(Arguments arguments, List<O> population, List<Integer> selected);
+    List<O> breed(Arguments arguments, List<O> population, List<Integer> selected);
 
-    default <O extends Organism> List<O> breed(Arguments arguments, List<O> population) {
+    default List<O> breed(Arguments arguments, List<O> population) {
         List<Integer> selected = select(arguments, population);
         return breed(arguments, population, selected);
     }
 
-    class Default implements Breeder {
+    class Default<O> implements Breeder<O> {
 
-        private Crosser crosser;
+        private Crosser<O> crosser;
+        private Fitter<O> fitter;
 
         private Default() {
-            // We need an instance responsible for the actual crossover
+            // We need a fitter and a crosser
         }
 
-        public Default(Crosser crosser) {
+        public Default(Crosser<O> crosser, Fitter<O> fitter) {
             this.crosser = crosser;
+            this.fitter = fitter;
         }
 
         @Override
-        public <O extends Organism> List<O> breed(Arguments arguments, List<O> population, List<Integer> selected) {
+        public List<O> breed(Arguments arguments, List<O> population, List<Integer> selected) {
             List<O> bred = new ArrayList<>();
 
             for (int i = 0; i < arguments.breedingPoolSize(); i+=2) {
@@ -47,19 +48,19 @@ public interface Breeder {
         }
 
         @Override
-        public <O extends Organism> List<Integer> select(Arguments arguments, List<O> population) {
+        public List<Integer> select(Arguments arguments, List<O> population) {
             double totalFitness = 0, accumulated = 0;
             int numSelected = 0;
 
-            for (Organism o : population) {
-                totalFitness += o.fitness().doubleValue();
+            for (O o : population) {
+                totalFitness += fitter.calculate(o).doubleValue();
             }
 
             List<BreederSelectionItem> selections = new ArrayList<>(population.size());
             for (int i = 0; i < population.size(); i++) {
                 selections.add(new BreederSelectionItem(
                         i,
-                        population.get(i).fitness().doubleValue() / totalFitness
+                        fitter.calculate(population.get(i)).doubleValue() / totalFitness
                 ));
             }
 
