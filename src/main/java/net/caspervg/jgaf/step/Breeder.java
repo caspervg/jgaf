@@ -126,7 +126,7 @@ public interface Breeder<O> {
 
             List<O> selected = new ArrayList<>(arguments.breedingPoolSize());
             for (int i = 0; i < arguments.breedingPoolSize(); i++) {
-                selected.add(spinRoulette(population, probabilities, totalFitness));
+                selected.add(spinRoulette(population, probabilities));
             }
 
             return selected;
@@ -145,9 +145,9 @@ public interface Breeder<O> {
             return fitnesses.stream().map(fitness -> fitness / totalFitness).collect(Collectors.toList());
         }
 
-        private O spinRoulette(Population<O> population, List<Double> relativeFitnesses, double totalFitness) {
+        private O spinRoulette(Population<O> population, List<Double> relativeFitnesses) {
             Random random = new Random();
-            double roulette = random.nextDouble() * totalFitness;
+            double roulette = random.nextDouble();
 
             double lowerBound = 0.0, upperBound = 0.0;
             for (int i = 0; i < population.size(); i++) {
