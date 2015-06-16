@@ -2,11 +2,9 @@ package net.caspervg.jgaf.step;
 
 import net.caspervg.jgaf.Arguments;
 import net.caspervg.jgaf.Population;
+import net.caspervg.jgaf.util.FitnessComparator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -105,13 +103,18 @@ public interface Killer<O> {
          */
         @Override
         public List<O> select(Arguments arguments, Population<O> population) {
-            double totalFitness = calculateTotalFitness(population);
-            List<Double> fitnesses = calculateAbsoluteFitnesses(population);
+            List<O> organisms = new ArrayList<>(population.getAll());
+            Collections.sort(organisms, new FitnessComparator<>(fitter));
+            Collections.reverse(organisms);
+            Population<O> sortedPopulation = new Population.Default<>(organisms);
+
+            double totalFitness = calculateTotalFitness(sortedPopulation);
+            List<Double> fitnesses = calculateAbsoluteFitnesses(sortedPopulation);
             List<Double> probabilities = calculateRelativeFitnesses(fitnesses, totalFitness);
 
             List<O> selected = new ArrayList<>(arguments.breedingPoolSize());
             for (int i = 0; i < arguments.breedingPoolSize(); i++) {
-                selected.add(spinRoulette(population, probabilities));
+                selected.add(spinRoulette(sortedPopulation, probabilities));
             }
 
             return selected;
