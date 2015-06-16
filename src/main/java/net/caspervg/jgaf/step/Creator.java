@@ -9,6 +9,7 @@ import java.util.List;
  *
  * @param <O> Type of the organism
  */
+@FunctionalInterface
 public interface Creator<O> {
 
     /**

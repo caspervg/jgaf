@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
  *
  * @param <O> Type of the organism
  */
+@FunctionalInterface
 public interface Mutator<O> {
 
     /**

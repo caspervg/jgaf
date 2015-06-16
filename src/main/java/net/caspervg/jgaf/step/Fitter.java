@@ -5,6 +5,7 @@ package net.caspervg.jgaf.step;
  *
  * @param <O> Type of the organism
  */
+@FunctionalInterface
 public interface Fitter<O> {
 
     /**
