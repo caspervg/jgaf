@@ -1,12 +1,14 @@
 package net.caspervg.jgaf.step;
 
 import net.caspervg.jgaf.Arguments;
+import net.caspervg.jgaf.Population;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * Provides a way to kill organisms in the population
@@ -22,7 +24,7 @@ public interface Killer<O> {
      * @param population Population to select from
      * @return List of indices of organisms to kill
      */
-    List<O> select(Arguments arguments, List<O> population);
+    Collection<O> select(Arguments arguments, Population<O> population);
 
     /**
      * Kills the selected individuals
@@ -30,19 +32,21 @@ public interface Killer<O> {
      * @param arguments Arguments to use
      * @param population Population to kill from
      * @param selected Indices of organisms in the population to kill
+     * @return New population with the selected organisms removed
      */
-    void kill(Arguments arguments, List<O> population, List<O> selected);
+    Population<O> kill(Arguments arguments, Population<O> population, Collection<O> selected);
 
     /**
-     * Selects the individuals to kill using {@link #select(Arguments, List)}, then kills
-     * them using {@link #kill(Arguments, List, List)}
+     * Selects the individuals to kill using {@link #select(Arguments, Population)}, then kills
+     * them using {@link #kill(Arguments, Population, Collection)}
      *
      * @param arguments Arguments to use
      * @param population Population to select and kill from
+     * @return New population with the selected organisms removed
      */
-    default void kill(Arguments arguments, List<O> population) {
-        List<O> selected = select(arguments, population);
-        kill(arguments, population, selected);
+    default Population<O> kill(Arguments arguments, Population<O> population) {
+        Collection<O> selected = select(arguments, population);
+        return kill(arguments, population, selected);
     }
 
     /**
@@ -79,8 +83,10 @@ public interface Killer<O> {
          * @param selected {@inheritDoc}
          */
         @Override
-        public void kill(Arguments arguments, List<O> population, List<O> selected) {
-            population.removeAll(selected);
+        public Population<O> kill(Arguments arguments, Population<O> population, Collection<O> selected) {
+            Collection<O> organisms = population.getAll();
+            organisms.removeAll(selected);
+            return new Population.Default<>(organisms);
         }
 
         /**
@@ -99,68 +105,49 @@ public interface Killer<O> {
          * @return {@inheritDoc}
          */
         @Override
-        public List<O> select(Arguments arguments, List<O> population) {
-            double totalFitness = 0, accumulated = 0;
-            int numSelected = 0;
+        public List<O> select(Arguments arguments, Population<O> population) {
+            double totalFitness = calculateTotalFitness(population);
+            List<Double> fitnesses = calculateAbsoluteFitnesses(population);
+            List<Double> probabilities = calculateRelativeFitnesses(fitnesses, totalFitness);
 
-            for (O o : population) {
-                totalFitness += fitter.calculate(o).doubleValue();
-            }
-
-            List<KillerSelectionItem> selections = new ArrayList<>(population.size());
-            for (int i = 0; i < population.size(); i++) {
-                selections.add(new KillerSelectionItem(
-                        i,
-                        fitter.calculate(population.get(i)).doubleValue() / totalFitness
-                ));
-            }
-
-            selections.sort(KillerSelectionItem::compareTo);
-
-            for (int i = 0; i < population.size(); i++) {
-                accumulated += selections.get(i).getNormalizedFitness();
-                selections.set(i, new KillerSelectionItem(
-                        selections.get(i),
-                        accumulated
-                ));
-            }
-
-            List<O> selected = new ArrayList<>(arguments.killingPoolSize());
-            Random random = new Random();
-            while (numSelected < arguments.killingPoolSize()) {
-                double cutOff = random.nextDouble() * selections.get(0).getAccumulatedFitness();
-
-                for (int i = 0; i < population.size(); i++) {
-                    if (selections.get(i).getAccumulatedFitness() > cutOff) {
-                        selected.add(population.get(selections.get(i).getIndex()));
-                        selections.set(i, new KillerSelectionItem(
-                                selections.get(i),
-                                -1.0D
-                        ));
-                        break;
-                    }
-                }
-
-                numSelected++;
+            List<O> selected = new ArrayList<>(arguments.breedingPoolSize());
+            for (int i = 0; i < arguments.breedingPoolSize(); i++) {
+                selected.add(spinRoulette(population, probabilities, totalFitness));
             }
 
             return selected;
         }
-    }
 
-    class KillerSelectionItem extends SelectionItem implements Comparable<KillerSelectionItem> {
-
-        KillerSelectionItem(int index, double normalizedFitness) {
-            super(index, normalizedFitness);
+        private double calculateTotalFitness(Population<O> population) {
+            return population.getAll().stream().collect(Collectors.summingDouble(fitter::calculate));
         }
 
-        KillerSelectionItem(KillerSelectionItem old, double accumulatedFitness) {
-            super(old, accumulatedFitness);
+        private List<Double> calculateAbsoluteFitnesses(Population<O> population) {
+            return population.getAll().stream().map(o -> fitter.calculate(o).doubleValue()).collect(Collectors.toList());
         }
 
-        @Override
-        public int compareTo(@NotNull KillerSelectionItem selectionItem) {
-            return Double.compare(getNormalizedFitness(), selectionItem.getNormalizedFitness());
+        private List<Double> calculateRelativeFitnesses(List<Double> fitnesses, double totalFitness) {
+            // Larger fitness => smaller probability => smaller chance to be picked for breeding
+            return fitnesses.stream().map(fitness -> totalFitness / fitness).collect(Collectors.toList());
+        }
+
+        private O spinRoulette(Population<O> population, List<Double> relativeFitnesses, double totalFitness) {
+            Random random = new Random();
+            double roulette = random.nextDouble() * totalFitness;
+
+            double lowerBound = 0.0, upperBound = 0.0;
+            for (int i = 0; i < population.size(); i++) {
+                double relativeFitness = relativeFitnesses.get(i);
+
+                upperBound += relativeFitness;
+                if (lowerBound <= roulette && upperBound > roulette) {
+                    return population.get(i);
+                } else {
+                    lowerBound = upperBound;
+                }
+            }
+
+            throw new AssertionError("This should never happen");
         }
     }
 }

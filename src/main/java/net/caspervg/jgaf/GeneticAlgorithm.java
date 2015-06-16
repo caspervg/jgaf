@@ -3,7 +3,7 @@ package net.caspervg.jgaf;
 import net.caspervg.jgaf.util.FitnessComparator;
 import net.caspervg.jgaf.step.StepProvider;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Provides the genetic algorithm
@@ -56,10 +56,10 @@ public interface GeneticAlgorithm<O> {
         @Override
         public Solution<O> run(Arguments arguments, StepProvider<O> provider) {
             int iterations = 0;
-            List<O> population = provider.creator().create(arguments);
+            Population<O> population = provider.creator().create(arguments);
 
             while (iterations < arguments.numIterations()) {
-                List<O> children = provider.breeder().breed(arguments, population);
+                Collection<O> children = provider.breeder().breed(arguments, population);
                 children = provider.mutator().mutate(arguments, children);
 
                 population.addAll(children);
@@ -70,7 +70,7 @@ public interface GeneticAlgorithm<O> {
             }
 
             FitnessComparator<O> comparator = new FitnessComparator<>(provider.fitter());
-            O bestOrganism = population.stream().max(comparator).get();
+            O bestOrganism = population.getAll().stream().max(comparator).get();
             Number bestFitness = provider.fitter().calculate(bestOrganism);
             return new Solution<>(
                     bestFitness,

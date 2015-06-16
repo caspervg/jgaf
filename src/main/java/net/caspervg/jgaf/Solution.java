@@ -10,7 +10,7 @@ import java.util.List;
 public class Solution<O> {
     Number bestFitness;
     O bestOrganism;
-    List<O> finalPopulation;
+    Population<O> finalPopulation;
 
     /**
      * Creates a new solution
@@ -19,7 +19,7 @@ public class Solution<O> {
      * @param bestOrganism Best organism that was found
      * @param finalPopulation Final population
      */
-    public Solution(Number bestFitness, O bestOrganism, List<O> finalPopulation) {
+    public Solution(Number bestFitness, O bestOrganism, Population<O> finalPopulation) {
         this.bestFitness = bestFitness;
         this.bestOrganism = bestOrganism;
         this.finalPopulation = finalPopulation;
@@ -48,7 +48,7 @@ public class Solution<O> {
      *
      * @return Final population
      */
-    public List<O> getFinalPopulation() {
+    public Population<O> getFinalPopulation() {
         return finalPopulation;
     }
 }

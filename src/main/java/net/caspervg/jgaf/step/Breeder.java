@@ -1,11 +1,13 @@
 package net.caspervg.jgaf.step;
 
 import net.caspervg.jgaf.Arguments;
-import org.jetbrains.annotations.NotNull;
+import net.caspervg.jgaf.Population;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * Provides a way to breed (a part of) the population based on given arguments
@@ -19,9 +21,9 @@ public interface Breeder<O> {
      *
      * @param arguments Arguments to use
      * @param population Population to select from
-     * @return List of indices of organisms to breed
+     * @return Collection of organisms to breed
      */
-    List<Integer> select(Arguments arguments, List<O> population);
+     Collection<O> select(Arguments arguments, Population<O> population);
 
     /**
      * Breeds the selected individuals
@@ -29,20 +31,20 @@ public interface Breeder<O> {
      * @param arguments Arguments to use
      * @param population Population to breed from
      * @param selected Indices of organisms in the population to breed
-     * @return List of children
+     * @return Collection of children that were bred
      */
-    List<O> breed(Arguments arguments, List<O> population, List<Integer> selected);
+    Collection<O> breed(Arguments arguments, Population<O> population, Collection<O> selected);
 
     /**
-     * Selects the individuals to breed using {@link #select(Arguments, List)}, then breeds
-     * them using {@link #breed(Arguments, List, List)}
+     * Selects the individuals to breed using {@link #select(Arguments, Population)}, then breeds
+     * them using {@link #breed(Arguments, Population, Collection)}
      *
      * @param arguments Arguments to use
      * @param population Population to select and breed from
-     * @return List of children
+     * @return Collection of children that were bred
      */
-    default List<O> breed(Arguments arguments, List<O> population) {
-        List<Integer> selected = select(arguments, population);
+    default Collection<O> breed(Arguments arguments, Population<O> population) {
+        Collection<O> selected = select(arguments, population);
         return breed(arguments, population, selected);
     }
 
@@ -85,12 +87,13 @@ public interface Breeder<O> {
          * @return {@inheritDoc}
          */
         @Override
-        public List<O> breed(Arguments arguments, List<O> population, List<Integer> selected) {
+        public Collection<O> breed(Arguments arguments, Population<O> population, Collection<O> selected) {
             List<O> bred = new ArrayList<>();
+            List<O> breedables = new ArrayList<>(selected);
 
             for (int i = 0; i < arguments.breedingPoolSize(); i+=2) {
-                O father = population.get(selected.get(i));
-                O mother = population.get(selected.get(i+1));
+                O father = breedables.get(i);
+                O mother = breedables.get(i+1);
                 List<O> parents = new ArrayList<>();
                 parents.add(father);
                 parents.add(mother);
@@ -116,68 +119,49 @@ public interface Breeder<O> {
          * @return {@inheritDoc}
          */
         @Override
-        public List<Integer> select(Arguments arguments, List<O> population) {
-            double totalFitness = 0, accumulated = 0;
-            int numSelected = 0;
+        public Collection<O> select(Arguments arguments, Population<O> population) {
+            double totalFitness = calculateTotalFitness(population);
+            List<Double> fitnesses = calculateAbsoluteFitnesses(population);
+            List<Double> probabilities = calculateRelativeFitnesses(fitnesses, totalFitness);
 
-            for (O o : population) {
-                totalFitness += fitter.calculate(o).doubleValue();
-            }
-
-            List<BreederSelectionItem> selections = new ArrayList<>(population.size());
-            for (int i = 0; i < population.size(); i++) {
-                selections.add(new BreederSelectionItem(
-                        i,
-                        fitter.calculate(population.get(i)).doubleValue() / totalFitness
-                ));
-            }
-
-            selections.sort(BreederSelectionItem::compareTo);
-
-            for (int i = 0; i < population.size(); i++) {
-                accumulated += selections.get(i).getNormalizedFitness();
-                selections.set(i, new BreederSelectionItem(
-                        selections.get(i),
-                        accumulated
-                ));
-            }
-
-            List<Integer> selected = new ArrayList<>(arguments.breedingPoolSize());
-            Random random = new Random();
-            while (numSelected < arguments.breedingPoolSize()) {
-                double cutOff = random.nextDouble() * selections.get(selections.size() - 1).getAccumulatedFitness();
-
-                for (int i = 0; i < population.size(); i++) {
-                    if (selections.get(i).getAccumulatedFitness() > cutOff) {
-                        selected.add(selections.get(i).getIndex());
-                        selections.set(i, new BreederSelectionItem(
-                                selections.get(i),
-                                -1.0D
-                        ));
-                        break;
-                    }
-                }
-
-                numSelected++;
+            List<O> selected = new ArrayList<>(arguments.breedingPoolSize());
+            for (int i = 0; i < arguments.breedingPoolSize(); i++) {
+                selected.add(spinRoulette(population, probabilities, totalFitness));
             }
 
             return selected;
         }
+
+        private double calculateTotalFitness(Population<O> population) {
+            return population.getAll().stream().collect(Collectors.summingDouble(fitter::calculate));
+        }
+
+        private List<Double> calculateAbsoluteFitnesses(Population<O> population) {
+            return population.getAll().stream().map(o -> fitter.calculate(o).doubleValue()).collect(Collectors.toList());
+        }
+
+        private List<Double> calculateRelativeFitnesses(List<Double> fitnesses, double totalFitness) {
+            // Larger fitness => larger probability => larger chance to be picked for breeding
+            return fitnesses.stream().map(fitness -> fitness / totalFitness).collect(Collectors.toList());
+        }
+
+        private O spinRoulette(Population<O> population, List<Double> relativeFitnesses, double totalFitness) {
+            Random random = new Random();
+            double roulette = random.nextDouble() * totalFitness;
+
+            double lowerBound = 0.0, upperBound = 0.0;
+            for (int i = 0; i < population.size(); i++) {
+                double relativeFitness = relativeFitnesses.get(i);
+
+                upperBound += relativeFitness;
+                if (lowerBound <= roulette && upperBound > roulette) {
+                    return population.get(i);
+                } else {
+                    lowerBound = upperBound;
+                }
+            }
+
+            throw new AssertionError("This should never happen");
+        }
     }
-
-    class BreederSelectionItem extends SelectionItem implements Comparable<BreederSelectionItem> {
-        BreederSelectionItem(int index, double normalizedFitness) {
-            super(index, normalizedFitness);
-        }
-
-        BreederSelectionItem(BreederSelectionItem old, double accumulatedFitness) {
-            super(old, accumulatedFitness);
-        }
-
-        @Override
-        public int compareTo(@NotNull BreederSelectionItem selectionItem) {
-            return -Double.compare(getNormalizedFitness(), selectionItem.getNormalizedFitness());
-        }
-    }
-
 }
