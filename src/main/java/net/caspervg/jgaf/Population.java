@@ -5,6 +5,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Provides a semantic representation of a {@link Collection} of organisms
+ *
+ * @param <O> Type of the organism
+ */
 public interface Population<O> extends Iterable<O> {
 
     /**
