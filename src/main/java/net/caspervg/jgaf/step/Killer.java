@@ -16,7 +16,7 @@ import java.util.Random;
 public interface Killer<O> {
 
     /**
-     * Selects the iorganisms in the population that should be killed
+     * Selects the organisms in the population that should be killed
      *
      * @param arguments Arguments to use
      * @param population Population to select from
