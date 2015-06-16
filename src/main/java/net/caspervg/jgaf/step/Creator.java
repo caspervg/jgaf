@@ -1,6 +1,7 @@
 package net.caspervg.jgaf.step;
 
 import net.caspervg.jgaf.Arguments;
+import net.caspervg.jgaf.Population;
 
 import java.util.List;
 
@@ -18,5 +19,5 @@ public interface Creator<O> {
      * @param arguments Arguments to use
      * @return Initial population
      */
-    List<O> create(Arguments arguments);
+    Population<O> create(Arguments arguments);
 }
