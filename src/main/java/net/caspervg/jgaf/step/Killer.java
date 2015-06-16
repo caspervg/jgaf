@@ -2,7 +2,6 @@ package net.caspervg.jgaf.step;
 
 import net.caspervg.jgaf.Arguments;
 import net.caspervg.jgaf.Population;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
