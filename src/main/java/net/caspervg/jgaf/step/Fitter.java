@@ -15,5 +15,5 @@ public interface Fitter<O> {
      * @param <N> Type of the {@link Number} to return
      * @return Fitness of the organism
      */
-    <N extends Number> N calculate(O organism);
+    <N extends Number & Comparable> N calculate(O organism);
 }

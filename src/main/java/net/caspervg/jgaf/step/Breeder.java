@@ -4,7 +4,6 @@ import net.caspervg.jgaf.Arguments;
 import net.caspervg.jgaf.Population;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Provides a way to breed (a part of) the population based on given arguments

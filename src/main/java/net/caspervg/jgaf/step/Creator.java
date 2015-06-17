@@ -3,8 +3,6 @@ package net.caspervg.jgaf.step;
 import net.caspervg.jgaf.Arguments;
 import net.caspervg.jgaf.Population;
 
-import java.util.List;
-
 /**
  * Provides a way to create an initial population based on the arguments
  *

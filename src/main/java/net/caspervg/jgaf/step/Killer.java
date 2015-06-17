@@ -4,7 +4,6 @@ import net.caspervg.jgaf.Arguments;
 import net.caspervg.jgaf.Population;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Provides a way to kill organisms in the population

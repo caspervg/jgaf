@@ -1,7 +1,5 @@
 package net.caspervg.jgaf;
 
-import java.util.List;
-
 /**
  * Provides the solution of a genetic algorithm
  *
