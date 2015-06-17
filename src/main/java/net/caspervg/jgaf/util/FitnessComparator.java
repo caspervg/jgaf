@@ -12,6 +12,7 @@ import java.util.Comparator;
 public class FitnessComparator<O> implements Comparator<O> {
 
     private Fitter<O> fitter;
+    private NumberComparator<Double> comparator;
 
     private FitnessComparator() {
         // Need a fitter
@@ -24,6 +25,7 @@ public class FitnessComparator<O> implements Comparator<O> {
      */
     public FitnessComparator(Fitter<O> fitter) {
         this.fitter = fitter;
+        this.comparator = new NumberComparator<>();
     }
 
     /**
@@ -38,7 +40,7 @@ public class FitnessComparator<O> implements Comparator<O> {
      */
     @Override
     public int compare(O a, O b) {
-        return new NumberComparator<>().compare(fitter.calculate(a), fitter.calculate(b));
+        return comparator.compare(fitter.calculate(a), fitter.calculate(b));
     }
 
     class NumberComparator<T extends Number & Comparable> implements Comparator<T> {

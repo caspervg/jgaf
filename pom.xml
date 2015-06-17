@@ -6,7 +6,7 @@
 
     <groupId>net.caspervg.jgaf</groupId>
     <artifactId>jgaf</artifactId>
-    <version>0.4.1-SNAPSHOT</version>
+    <version>0.4.7</version>
 
     <name>JGAF</name>
     <description>A framework for easy development and usage of genetic algorithms</description>
@@ -37,11 +37,6 @@
     </scm>
 
     <dependencies>
-        <dependency>
-            <groupId>com.intellij</groupId>
-            <artifactId>annotations</artifactId>
-            <version>5.1</version>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

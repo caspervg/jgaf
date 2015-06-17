@@ -64,7 +64,7 @@ public interface GeneticAlgorithm<O> {
 
                 population.addAll(children);
 
-                provider.killer().kill(arguments, population);
+                population = provider.killer().kill(arguments, population);
 
                 iterations++;
             }

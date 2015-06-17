@@ -2,7 +2,6 @@ package net.caspervg.jgaf.step;
 
 import net.caspervg.jgaf.Arguments;
 import net.caspervg.jgaf.Population;
-import net.caspervg.jgaf.util.FitnessComparator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,6 +54,7 @@ public interface Breeder<O> {
 
         private Crosser<O> crosser;
         private Fitter<O> fitter;
+        private Random random;
 
         private Default() {
             // We need a fitter and a crosser
@@ -69,6 +69,7 @@ public interface Breeder<O> {
         public Default(Crosser<O> crosser, Fitter<O> fitter) {
             this.crosser = crosser;
             this.fitter = fitter;
+            this.random = new Random();
         }
 
         /**
@@ -119,51 +120,74 @@ public interface Breeder<O> {
         @Override
         public Collection<O> select(Arguments arguments, Population<O> population) {
             List<O> organisms = new ArrayList<>(population.getAll());
-            Collections.sort(organisms, new FitnessComparator<>(fitter));
-            Population<O> sortedPopulation = new Population.Default<>(organisms);
 
-            double totalFitness = calculateTotalFitness(sortedPopulation);
-            List<Double> fitnesses = calculateAbsoluteFitnesses(sortedPopulation);
-            List<Double> probabilities = calculateRelativeFitnesses(fitnesses, totalFitness);
+            double totalFitness = calculateTotalFitness(organisms);
+            List<Double> fitnesses = calculateAbsoluteFitnesses(organisms);
+            List<Double> probabilities = calculateNormalizedFitnesses(fitnesses, totalFitness);
+            List<Double> accumulateds = calculateAccumulatedFitnesses(probabilities);
+
+            List<BreederSelectionItem> selections = new ArrayList<>();
+            for (int i = 0; i < population.size(); i++) {
+                selections.add(new BreederSelectionItem(
+                        i,
+                        probabilities.get(i),
+                        accumulateds.get(i)
+                ));
+            }
+            Collections.sort(selections, BreederSelectionItem::compareTo);
 
             List<O> selected = new ArrayList<>(arguments.breedingPoolSize());
             for (int i = 0; i < arguments.breedingPoolSize(); i++) {
-                selected.add(spinRoulette(sortedPopulation, probabilities));
+                selected.add(organisms.get(spinRoulette(selections)));
             }
 
             return selected;
         }
 
-        private double calculateTotalFitness(Population<O> population) {
-            return population.getAll().stream().collect(Collectors.summingDouble(fitter::calculate));
+        protected double calculateTotalFitness(List<O> population) {
+            return population.stream().collect(Collectors.summingDouble(fitter::calculate));
         }
 
-        private List<Double> calculateAbsoluteFitnesses(Population<O> population) {
-            return population.getAll().stream().map(o -> fitter.calculate(o).doubleValue()).collect(Collectors.toList());
+        protected List<Double> calculateAbsoluteFitnesses(List<O> population) {
+            return population.stream().map(o -> fitter.calculate(o).doubleValue()).collect(Collectors.toList());
         }
 
-        private List<Double> calculateRelativeFitnesses(List<Double> fitnesses, double totalFitness) {
-            // Larger fitness => larger probability => larger chance to be picked for breeding
+        protected List<Double> calculateNormalizedFitnesses(List<Double> fitnesses, double totalFitness) {
             return fitnesses.stream().map(fitness -> fitness / totalFitness).collect(Collectors.toList());
         }
 
-        private O spinRoulette(Population<O> population, List<Double> relativeFitnesses) {
-            Random random = new Random();
-            double roulette = random.nextDouble();
+        protected List<Double> calculateAccumulatedFitnesses(List<Double> normalizedFitnesses) {
+            List<Double> accumulatedFitnesses = new ArrayList<>(normalizedFitnesses.size());
+            double accumulator = 0.0;
+            for (Double fitness : normalizedFitnesses) {
+                accumulator += fitness;
+                accumulatedFitnesses.add(accumulator);
+            }
 
-            double lowerBound = 0.0, upperBound = 0.0;
-            for (int i = 0; i < population.size(); i++) {
-                double relativeFitness = relativeFitnesses.get(i);
+            return accumulatedFitnesses;
+        }
 
-                upperBound += relativeFitness;
-                if (lowerBound <= roulette && upperBound > roulette) {
-                    return population.get(i);
-                } else {
-                    lowerBound = upperBound;
+        protected int spinRoulette(List<BreederSelectionItem> selections) {
+            double roulette = random.nextDouble() * selections.get(selections.size() - 1).getAccumulatedFitness();
+
+            for (BreederSelectionItem selectionItem : selections) {
+                if (selectionItem.getAccumulatedFitness() > roulette) {
+                    return selectionItem.getIndex();
                 }
             }
 
             throw new AssertionError("This should never happen");
+        }
+    }
+
+    class BreederSelectionItem extends SelectionItem implements Comparable<BreederSelectionItem> {
+        BreederSelectionItem(int index, double normalizedFitness, double accumulatedFitness) {
+            super(index, normalizedFitness, accumulatedFitness);
+        }
+
+        @Override
+        public int compareTo(BreederSelectionItem selectionItem) {
+            return -Double.compare(getNormalizedFitness(), selectionItem.getNormalizedFitness());
         }
     }
 }
