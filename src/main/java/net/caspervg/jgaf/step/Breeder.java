@@ -143,7 +143,7 @@ public interface Breeder<O> {
             return selected;
         }
 
-        protected double calculateTotalFitness(List<Double> fitnesses) {
+        private double calculateTotalFitness(List<Double> fitnesses) {
             double totalFitness = 0;
             for (Double fitness : fitnesses) {
                 totalFitness += fitness;
@@ -151,7 +151,7 @@ public interface Breeder<O> {
             return totalFitness;
         }
 
-        protected List<Double> calculateAbsoluteFitnesses(List<O> population) {
+        private List<Double> calculateAbsoluteFitnesses(List<O> population) {
             List<Double> absoluteFitnesses = new ArrayList<>(population.size());
             for (O o : population) {
                 absoluteFitnesses.add(fitter.calculate(o));
@@ -159,7 +159,7 @@ public interface Breeder<O> {
             return absoluteFitnesses;
         }
 
-        protected List<Double> calculateNormalizedFitnesses(List<Double> fitnesses, double totalFitness) {
+        private List<Double> calculateNormalizedFitnesses(List<Double> fitnesses, double totalFitness) {
             List<Double> normalizedFitnesses = new ArrayList<>(fitnesses.size());
             for (Double fitness: fitnesses) {
                 normalizedFitnesses.add(fitness / totalFitness);
@@ -167,7 +167,7 @@ public interface Breeder<O> {
             return normalizedFitnesses;
         }
 
-        protected List<Double> calculateAccumulatedFitnesses(List<Double> normalizedFitnesses) {
+        private List<Double> calculateAccumulatedFitnesses(List<Double> normalizedFitnesses) {
             List<Double> accumulatedFitnesses = new ArrayList<>(normalizedFitnesses.size());
             double accumulator = 0.0;
             for (Double fitness : normalizedFitnesses) {
@@ -178,7 +178,7 @@ public interface Breeder<O> {
             return accumulatedFitnesses;
         }
 
-        protected int spinRoulette(List<BreederSelectionItem> selections) {
+        private int spinRoulette(List<BreederSelectionItem> selections) {
             double roulette = random.nextDouble() * selections.get(selections.size() - 1).getAccumulatedFitness();
 
             for (BreederSelectionItem selectionItem : selections) {
