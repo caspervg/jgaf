@@ -121,8 +121,8 @@ public interface Breeder<O> {
         public Collection<O> select(Arguments arguments, Population<O> population) {
             List<O> organisms = new ArrayList<>(population.getAll());
 
-            double totalFitness = calculateTotalFitness(organisms);
             List<Double> fitnesses = calculateAbsoluteFitnesses(organisms);
+            double totalFitness = calculateTotalFitness(fitnesses);
             List<Double> probabilities = calculateNormalizedFitnesses(fitnesses, totalFitness);
             List<Double> accumulateds = calculateAccumulatedFitnesses(probabilities);
 
@@ -144,16 +144,28 @@ public interface Breeder<O> {
             return selected;
         }
 
-        protected double calculateTotalFitness(List<O> population) {
-            return population.stream().collect(Collectors.summingDouble(fitter::calculate));
+        protected double calculateTotalFitness(List<Double> fitnesses) {
+            double totalFitness = 0;
+            for (Double fitness : fitnesses) {
+                totalFitness += fitness;
+            }
+            return totalFitness;
         }
 
         protected List<Double> calculateAbsoluteFitnesses(List<O> population) {
-            return population.stream().map(o -> fitter.calculate(o).doubleValue()).collect(Collectors.toList());
+            List<Double> absoluteFitnesses = new ArrayList<>(population.size());
+            for (O o : population) {
+                absoluteFitnesses.add(fitter.calculate(o));
+            }
+            return absoluteFitnesses;
         }
 
         protected List<Double> calculateNormalizedFitnesses(List<Double> fitnesses, double totalFitness) {
-            return fitnesses.stream().map(fitness -> fitness / totalFitness).collect(Collectors.toList());
+            List<Double> normalizedFitnesses = new ArrayList<>(fitnesses.size());
+            for (Double fitness: fitnesses) {
+                normalizedFitnesses.add(fitness / totalFitness);
+            }
+            return normalizedFitnesses;
         }
 
         protected List<Double> calculateAccumulatedFitnesses(List<Double> normalizedFitnesses) {
