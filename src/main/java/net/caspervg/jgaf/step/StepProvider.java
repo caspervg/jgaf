@@ -1,5 +1,7 @@
 package net.caspervg.jgaf.step;
 
+import net.caspervg.jgaf.Optimizer;
+
 /**
  * Provides strategies for all the steps in a genetic algorithm.
  *
@@ -46,4 +48,12 @@ public interface StepProvider<O> {
      * @return Fitter for organisms
      */
     Fitter<O> fitter();
+
+    /**
+     * Provides a {@link Optimizer}
+     * This is used to compare organisms with each other based on their fitness
+     *
+     * @return Optimizer for organisms
+     */
+    Optimizer<O> optimizer();
 }

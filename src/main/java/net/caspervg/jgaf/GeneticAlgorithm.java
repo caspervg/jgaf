@@ -1,6 +1,5 @@
 package net.caspervg.jgaf;
 
-import net.caspervg.jgaf.util.FitnessComparator;
 import net.caspervg.jgaf.step.StepProvider;
 
 import java.util.Collection;
@@ -69,8 +68,8 @@ public interface GeneticAlgorithm<O> {
                 iterations++;
             }
 
-            FitnessComparator<O> comparator = new FitnessComparator<>(provider.fitter());
-            O bestOrganism = population.getAll().stream().max(comparator).get();
+
+            O bestOrganism = population.getAll().stream().max(provider.optimizer()).get();
             Number bestFitness = provider.fitter().calculate(bestOrganism);
             return new Solution<>(
                     bestFitness,
