@@ -50,6 +50,14 @@ public interface StepProvider<O> {
     Fitter<O> fitter();
 
     /**
+     * Provides a {@link Selector}.
+     * This is used to select which organism(s) are picked for breeding and death.
+     *
+     * @return Selector for organisms
+     */
+    Selector<O> selector();
+
+    /**
      * Provides a {@link Optimizer}
      * This is used to compare organisms with each other based on their fitness
      *

@@ -35,7 +35,6 @@ public interface GeneticAlgorithm<O> {
      *         </ol>
      *         <li>Find the best organism and return the solution</li>
      *     </ol>
-     * </p>
      *
      * @param <O> Type of the organism
      */
@@ -58,12 +57,14 @@ public interface GeneticAlgorithm<O> {
             Population<O> population = provider.creator().create(arguments);
 
             while (iterations < arguments.numIterations()) {
-                Collection<O> children = provider.breeder().breed(arguments, population);
+                Collection<O> parents = provider.selector().select(arguments, population, arguments.goal());
+                Collection<O> children = provider.breeder().breed(arguments, population, parents);
                 children = provider.mutator().mutate(arguments, children);
 
                 population.addAll(children);
 
-                population = provider.killer().kill(arguments, population);
+                Collection<O> conscripted = provider.selector().select(arguments, population, arguments.goal().opposite());
+                population = provider.killer().kill(arguments, population, conscripted);
 
                 iterations++;
             }

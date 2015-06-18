@@ -25,30 +25,6 @@ public class Optimizer<O> implements Comparator<O> {
         return goal.compare(fitness1, fitness2);
     }
 
-    public enum Goal {
-        /**
-         * Minimization of the fitness function
-         */
-        MINIMUM {
-            @Override
-            public <F extends Comparable<? super F>> int compare(F a, F b) {
-                return b.compareTo(a);
-            }
-        },
-
-        /**
-         * Maximization of the fitness function
-         */
-        MAXIMUM {
-            @Override
-            public <F extends Comparable<? super F>> int compare(F a, F b) {
-                return a.compareTo(b);
-            }
-        };
-
-        abstract <F extends Comparable<? super F>> int compare(final F a, final F b);
-    }
-
     public Comparator<O> descending() {
         return (a, b) -> compare(b, a);
     }
