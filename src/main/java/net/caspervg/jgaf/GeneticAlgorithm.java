@@ -1,6 +1,5 @@
 package net.caspervg.jgaf;
 
-import net.caspervg.jgaf.util.FitnessComparator;
 import net.caspervg.jgaf.step.StepProvider;
 
 import java.util.Collection;
@@ -36,7 +35,6 @@ public interface GeneticAlgorithm<O> {
      *         </ol>
      *         <li>Find the best organism and return the solution</li>
      *     </ol>
-     * </p>
      *
      * @param <O> Type of the organism
      */
@@ -59,18 +57,20 @@ public interface GeneticAlgorithm<O> {
             Population<O> population = provider.creator().create(arguments);
 
             while (iterations < arguments.numIterations()) {
-                Collection<O> children = provider.breeder().breed(arguments, population);
+                Collection<O> parents = provider.selector().select(arguments, population, arguments.goal());
+                Collection<O> children = provider.breeder().breed(arguments, population, parents);
                 children = provider.mutator().mutate(arguments, children);
 
                 population.addAll(children);
 
-                population = provider.killer().kill(arguments, population);
+                Collection<O> conscripted = provider.selector().select(arguments, population, arguments.goal().opposite());
+                population = provider.killer().kill(arguments, population, conscripted);
 
                 iterations++;
             }
 
-            FitnessComparator<O> comparator = new FitnessComparator<>(provider.fitter());
-            O bestOrganism = population.getAll().stream().max(comparator).get();
+
+            O bestOrganism = population.getAll().stream().max(provider.optimizer()).get();
             Number bestFitness = provider.fitter().calculate(bestOrganism);
             return new Solution<>(
                     bestFitness,

@@ -51,6 +51,17 @@ public interface Arguments {
     }
 
     /**
+     * Goal of the genetic algoritm. By default, this is {@link net.caspervg.jgaf.Goal.Maximum}.
+     * This means that the algorithm will strive to find an organism with the highest possible
+     * fitness (maximisation).
+     *
+     * @return Goal of the algorithm
+     */
+    default Goal goal() {
+        return new Goal.Maximum();
+    }
+
+    /**
      * Default set of arguments, using all the defaults outlined in the {@link Arguments} interface
      */
     class Default implements Arguments {

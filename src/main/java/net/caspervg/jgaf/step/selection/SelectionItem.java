@@ -1,6 +1,6 @@
-package net.caspervg.jgaf.step;
+package net.caspervg.jgaf.step.selection;
 
-abstract class SelectionItem {
+class SelectionItem implements Comparable<SelectionItem> {
     int index;
     double normalizedFitness;
     double accumulatedFitness;
@@ -23,4 +23,8 @@ abstract class SelectionItem {
         return accumulatedFitness;
     }
 
+    @Override
+    public int compareTo(SelectionItem o) {
+        return Double.compare(getNormalizedFitness(), o.getNormalizedFitness());
+    }
 }
