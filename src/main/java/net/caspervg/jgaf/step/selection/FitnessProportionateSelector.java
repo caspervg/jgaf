@@ -56,7 +56,7 @@ public class FitnessProportionateSelector<O> implements Selector<O> {
 
         List<O> selected = new ArrayList<>(arguments.breedingPoolSize());
         for (int i = 0; i < arguments.breedingPoolSize(); i++) {
-            selected.add(organisms.get(spinRoulette(selections)));
+            selected.add(organisms.get(spinRoulette(selections, goal)));
         }
 
         return selected;
@@ -97,11 +97,17 @@ public class FitnessProportionateSelector<O> implements Selector<O> {
         return accumulatedFitnesses;
     }
 
-    private int spinRoulette(List<SelectionItem> selections) {
-        double roulette = random.nextDouble() * selections.get(selections.size() - 1).getAccumulatedFitness();
+    private int spinRoulette(List<SelectionItem> selections, Goal goal) {
+        int selectionIndex = 0;
+        if (goal instanceof Goal.Maximum) {
+            // TODO We need to use polymorphism here!
+            selectionIndex = selections.size() - 1;
+        }
+        double roulette = random.nextDouble() * selections.get(selectionIndex).getAccumulatedFitness();
 
         for (SelectionItem selectionItem : selections) {
             if (selectionItem.getAccumulatedFitness() > roulette) {
+                selections.remove(selectionItem);
                 return selectionItem.getIndex();
             }
         }

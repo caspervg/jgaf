@@ -10,11 +10,11 @@ public interface Goal {
      */
     class Minimum implements Goal {
 
-        private Goal opposite = new Maximum();
+        private static Goal opposite = new Maximum();
 
         @Override
         public <F extends Comparable<? super F>> int compare(F a, F b) {
-            return b.compareTo(a);
+            return a.compareTo(b);
         }
 
         @Override
@@ -28,11 +28,11 @@ public interface Goal {
      */
     class Maximum implements Goal {
 
-        private Goal opposite = new Minimum();
+        private static Goal opposite = new Minimum();
 
         @Override
         public <F extends Comparable<? super F>> int compare(F a, F b) {
-            return a.compareTo(b);
+            return -a.compareTo(b);
         }
 
         @Override
