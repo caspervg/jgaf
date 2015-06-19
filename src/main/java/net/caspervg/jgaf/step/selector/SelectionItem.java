@@ -1,4 +1,4 @@
-package net.caspervg.jgaf.step.selection;
+package net.caspervg.jgaf.step.selector;
 
 class SelectionItem implements Comparable<SelectionItem> {
     int index;

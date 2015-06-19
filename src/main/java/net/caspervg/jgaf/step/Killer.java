@@ -22,29 +22,5 @@ public interface Killer<O> {
      */
     Population<O> kill(Arguments arguments, Population<O> population, Collection<O> selected);
 
-    /**
-     * Default implementation of a {@link Killer}
-     *
-     * @param <O> Type of the organism
-     */
-    class Default<O> implements Killer<O> {
 
-        /**
-         * {@inheritDoc}
-         * <p>
-         *     This implementation uses {@link Set#removeAll(Collection)} to remove the selected
-         *     organisms from the population. The new population will be returned
-         * </p>
-         *
-         * @param arguments {@inheritDoc}
-         * @param population {@inheritDoc}
-         * @param selected {@inheritDoc}
-         */
-        @Override
-        public Population<O> kill(Arguments arguments, Population<O> population, Collection<O> selected) {
-            Set<O> organisms = new HashSet<>(population.getAll());
-            organisms.removeAll(selected);
-            return new Population.Default<>(organisms);
-        }
-    }
 }

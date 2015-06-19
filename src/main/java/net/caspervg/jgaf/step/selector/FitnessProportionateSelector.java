@@ -1,4 +1,4 @@
-package net.caspervg.jgaf.step.selection;
+package net.caspervg.jgaf.step.selector;
 
 import net.caspervg.jgaf.Arguments;
 import net.caspervg.jgaf.Goal;
@@ -56,7 +56,7 @@ public class FitnessProportionateSelector<O> implements Selector<O> {
 
         List<O> selected = new ArrayList<>(arguments.breedingPoolSize());
         for (int i = 0; i < arguments.breedingPoolSize(); i++) {
-            selected.add(organisms.get(spinRoulette(selections, goal)));
+            selected.add(organisms.get(spinRoulette(selections)));
         }
 
         return selected;
@@ -97,13 +97,17 @@ public class FitnessProportionateSelector<O> implements Selector<O> {
         return accumulatedFitnesses;
     }
 
-    private int spinRoulette(List<SelectionItem> selections, Goal goal) {
-        int selectionIndex = 0;
-        if (goal instanceof Goal.Maximum) {
-            // TODO We need to use polymorphism here!
-            selectionIndex = selections.size() - 1;
+    private int spinRoulette(List<SelectionItem> selections) {
+        double maxFitness;
+        double first = selections.get(0).accumulatedFitness;
+        double last = selections.get(selections.size() - 1).accumulatedFitness;
+        if (first > last) {
+            maxFitness = first;
+        } else {
+            maxFitness = last;
         }
-        double roulette = random.nextDouble() * selections.get(selectionIndex).getAccumulatedFitness();
+
+        double roulette = random.nextDouble() * maxFitness;
 
         for (SelectionItem selectionItem : selections) {
             if (selectionItem.getAccumulatedFitness() > roulette) {
