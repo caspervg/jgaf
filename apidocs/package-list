@@ -1,3 +1,5 @@
 net.caspervg.jgaf
 net.caspervg.jgaf.step
-net.caspervg.jgaf.util
+net.caspervg.jgaf.step.breeder
+net.caspervg.jgaf.step.killer
+net.caspervg.jgaf.step.selector
