@@ -10,7 +10,7 @@ import java.util.*;
  *
  * @param <O> Type of the organism
  */
-public interface Breeder<O> {
+public interface Breeder<O> extends Step<O> {
 
     /**
      * Breeds the selected individuals

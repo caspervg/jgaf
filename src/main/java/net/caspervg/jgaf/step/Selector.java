@@ -6,7 +6,7 @@ import net.caspervg.jgaf.Population;
 
 import java.util.Collection;
 
-public interface Selector<O> {
+public interface Selector<O> extends Step<O> {
 
     /**
      * Selects the organisms in a population that should be killed or bred

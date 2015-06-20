@@ -1,5 +1,6 @@
 package net.caspervg.jgaf.step;
 
+import net.caspervg.jgaf.Goal;
 import net.caspervg.jgaf.Optimizer;
 
 /**
@@ -7,7 +8,7 @@ import net.caspervg.jgaf.Optimizer;
  *
  * @param <O> Type of the organism
  */
-public interface StepProvider<O> {
+public interface Provider<O> {
 
     /**
      * Provides a {@link Creator}.
@@ -64,4 +65,11 @@ public interface StepProvider<O> {
      * @return Optimizer for organisms
      */
     Optimizer<O> optimizer();
+
+    /**
+     * Provides a {@link Goal} for the Genetic Algorithm (for example: maximisation)
+     *
+     * @return Goal for the genetic algorithm
+     */
+    Goal goal();
 }
