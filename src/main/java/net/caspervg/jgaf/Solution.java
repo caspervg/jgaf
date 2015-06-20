@@ -11,7 +11,7 @@ public class Solution<O> {
     Population<O> finalPopulation;
 
     /**
-     * Creates a new solution
+     * Creates a new solution with given best fitness, best organism and final population
      *
      * @param bestFitness Best fitness that was found
      * @param bestOrganism Best organism that was found

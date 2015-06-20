@@ -25,20 +25,4 @@ public class Optimizer<O> implements Comparator<O> {
         return goal.compare(fitness1, fitness2);
     }
 
-    public Comparator<O> descending() {
-        return (a, b) -> compare(b, a);
-    }
-
-    public Comparator<O> ascending() {
-        return (a, b) -> compare(a, b);
-    }
-
-    public O best(final O a, final O b) {
-        return compare(a, b) > 0 ? b : a;
-    }
-
-    public O worst(final O a, final O b) {
-        return compare(b, a) < 0 ? b : a;
-    }
-
 }
