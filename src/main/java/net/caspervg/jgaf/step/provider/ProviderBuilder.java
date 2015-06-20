@@ -4,7 +4,6 @@ import net.caspervg.jgaf.Goal;
 import net.caspervg.jgaf.Optimizer;
 import net.caspervg.jgaf.step.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class ProviderBuilder<O> {
@@ -17,6 +16,10 @@ public class ProviderBuilder<O> {
     private Selector<O> selector;
     private Optimizer<O> optimizer;
     private Goal goal;
+
+    public static <T> ProviderBuilder<T> aProvider() {
+        return new ProviderBuilder<>();
+    }
 
     public ProviderBuilder<O> withBreeder(Breeder<O> breeder) {
         this.breeder = breeder;
@@ -80,7 +83,7 @@ public class ProviderBuilder<O> {
         return this;
     }
 
-    public Provider build() {
+    public Provider<O> build() {
         return new BasicProvider<>(creator,
                 breeder,
                 mutator,
