@@ -4,24 +4,24 @@ import net.caspervg.jgaf.Goal;
 import net.caspervg.jgaf.Optimizer;
 import net.caspervg.jgaf.step.*;
 
-public class BasicProvider<O> implements Provider<O> {
+public class BasicProvider<F extends Number & Comparable, O> implements Provider<F, O> {
 
     private Breeder<O> breeder;
     private Creator<O> creator;
-    private Fitter<O> fitter;
+    private Fitter<F, O> fitter;
     private Killer<O> killer;
     private Mutator<O> mutator;
     private Selector<O> selector;
-    private Optimizer<O> optimizer;
+    private Optimizer<F, O> optimizer;
     private Goal goal;
 
     public BasicProvider(Creator<O> creator,
                          Breeder<O> breeder,
                          Mutator<O> mutator,
                          Killer<O> killer,
-                         Fitter<O> fitter,
+                         Fitter<F, O> fitter,
                          Selector<O> selector,
-                         Optimizer<O> optimizer,
+                         Optimizer<F, O> optimizer,
                          Goal goal) {
         this.creator = creator;
         this.breeder = breeder;
@@ -54,7 +54,7 @@ public class BasicProvider<O> implements Provider<O> {
     }
 
     @Override
-    public Fitter<O> fitter() {
+    public Fitter<F, O> fitter() {
         return fitter;
     }
 
@@ -64,7 +64,7 @@ public class BasicProvider<O> implements Provider<O> {
     }
 
     @Override
-    public Optimizer<O> optimizer() {
+    public Optimizer<F, O> optimizer() {
         return optimizer;
     }
 

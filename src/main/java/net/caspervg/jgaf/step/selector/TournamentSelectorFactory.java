@@ -14,7 +14,7 @@ public class TournamentSelectorFactory<O> extends AbstractSelectorFactory<O> {
             tournamentSize = (int) arguments[1];
         }
 
-        return new TournamentSelector<>((Fitter<O>) arguments[0], tournamentSize);
+        return new TournamentSelector<>((Fitter<?, O>) arguments[0], tournamentSize);
     }
 
 }

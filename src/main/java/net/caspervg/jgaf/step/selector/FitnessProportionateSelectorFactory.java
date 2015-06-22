@@ -8,7 +8,7 @@ public class FitnessProportionateSelectorFactory<O> extends AbstractSelectorFact
     @Override
     public FitnessProportionateSelector<O> newInstance(Object... arguments) {
         super.newInstance(arguments);
-        return new FitnessProportionateSelector<>((Fitter<O>) arguments[0]);
+        return new FitnessProportionateSelector<>((Fitter<?, O>) arguments[0]);
     }
 
 }

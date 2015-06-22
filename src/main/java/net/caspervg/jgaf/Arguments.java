@@ -11,7 +11,7 @@ public interface Arguments {
      * @return Size of the population
      */
     default int populationSize() {
-        return 1000;
+        return 10000;
     }
 
     /**
@@ -20,7 +20,7 @@ public interface Arguments {
      * @return Number of iterations
      */
     default int numIterations() {
-        return 1000;
+        return 10000;
     }
 
     /**

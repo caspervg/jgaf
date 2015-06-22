@@ -10,7 +10,7 @@ import java.util.*;
 
 public class FitnessProportionateSelector<O> extends AbstractSelector<O> {
 
-    public FitnessProportionateSelector(Fitter<O> fitter) {
+    public FitnessProportionateSelector(Fitter<?, O> fitter) {
         super(fitter);
     }
 
