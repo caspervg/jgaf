@@ -1,6 +1,6 @@
 package net.caspervg.jgaf;
 
-import net.caspervg.jgaf.step.StepProvider;
+import net.caspervg.jgaf.step.Provider;
 
 import java.util.Collection;
 
@@ -18,7 +18,7 @@ public interface GeneticAlgorithm<O> {
      * @param provider Strategy providers for the various steps
      * @return Solution object containing the best organism, the best fitness and the final population
      */
-    Solution<O> run(Arguments arguments, StepProvider<O> provider);
+    Solution<O> run(Arguments arguments, Provider<?, O> provider);
 
     /**
      * Default implementation of a genetic algorithm.
@@ -52,7 +52,7 @@ public interface GeneticAlgorithm<O> {
          * @return {@inheritDoc}
          */
         @Override
-        public Solution<O> run(Arguments arguments, StepProvider<O> provider) {
+        public Solution<O> run(Arguments arguments, Provider<?, O> provider) {
             int iterations = 0;
             Population<O> population = provider.creator().create(arguments);
 

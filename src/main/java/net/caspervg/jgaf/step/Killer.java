@@ -10,7 +10,7 @@ import java.util.*;
  *
  * @param <O> Type of the organism
  */
-public interface Killer<O> {
+public interface Killer<O> extends Step<O> {
 
     /**
      * Kills the selected individuals

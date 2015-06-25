@@ -9,10 +9,10 @@ import java.util.Random;
 
 abstract class AbstractSelector<O> implements Selector<O> {
 
-    protected Fitter<O> fitter;
+    protected Fitter<?, O> fitter;
     protected Random random;
 
-    public AbstractSelector(Fitter<O> fitter) {
+    public AbstractSelector(Fitter<?, O> fitter) {
         this.fitter = fitter;
         this.random = new Random();
     }
@@ -28,7 +28,7 @@ abstract class AbstractSelector<O> implements Selector<O> {
     List<Double> calculateAbsoluteFitnesses(List<O> population) {
         List<Double> absoluteFitnesses = new ArrayList<>(population.size());
         for (O o : population) {
-            absoluteFitnesses.add(fitter.calculate(o));
+            absoluteFitnesses.add(fitter.calculate(o).doubleValue());
         }
         return absoluteFitnesses;
     }

@@ -11,7 +11,7 @@ public class TournamentSelector<O> extends AbstractSelector<O> {
 
     private int tournamentSize;
 
-    public TournamentSelector(Fitter<O> fitter, int tournamentSize) {
+    public TournamentSelector(Fitter<?, O> fitter, int tournamentSize) {
         super(fitter);
         this.tournamentSize = tournamentSize;
     }
@@ -42,7 +42,7 @@ public class TournamentSelector<O> extends AbstractSelector<O> {
         int bestParticipantIndex = -1;
         for (Integer index : participantIndices) {
             O participant = organisms.get(index);
-            double participantFitness = fitter.calculate(participant);
+            double participantFitness = fitter.calculate(participant).doubleValue();
             if (goal.better(participantFitness, bestParticipantFitness)) {
                 bestParticipantFitness = participantFitness;
                 bestParticipantIndex = index;

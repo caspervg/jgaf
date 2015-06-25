@@ -1,25 +1,28 @@
 package net.caspervg.jgaf.step.provider;
 
+import net.caspervg.jgaf.Goal;
 import net.caspervg.jgaf.Optimizer;
 import net.caspervg.jgaf.step.*;
 
-public class BasicStepProvider<O> implements StepProvider<O> {
+public class BasicProvider<F extends Number & Comparable, O> implements Provider<F, O> {
 
     private Breeder<O> breeder;
     private Creator<O> creator;
-    private Fitter<O> fitter;
+    private Fitter<F, O> fitter;
     private Killer<O> killer;
     private Mutator<O> mutator;
     private Selector<O> selector;
-    private Optimizer<O> optimizer;
+    private Optimizer<F, O> optimizer;
+    private Goal goal;
 
-    public BasicStepProvider(Creator<O> creator,
-                             Breeder<O> breeder,
-                             Mutator<O> mutator,
-                             Killer<O> killer,
-                             Fitter<O> fitter,
-                             Selector<O> selector,
-                             Optimizer<O> optimizer) {
+    public BasicProvider(Creator<O> creator,
+                         Breeder<O> breeder,
+                         Mutator<O> mutator,
+                         Killer<O> killer,
+                         Fitter<F, O> fitter,
+                         Selector<O> selector,
+                         Optimizer<F, O> optimizer,
+                         Goal goal) {
         this.creator = creator;
         this.breeder = breeder;
         this.mutator = mutator;
@@ -27,6 +30,7 @@ public class BasicStepProvider<O> implements StepProvider<O> {
         this.fitter = fitter;
         this.selector = selector;
         this.optimizer = optimizer;
+        this.goal = goal;
     }
 
     @Override
@@ -50,7 +54,7 @@ public class BasicStepProvider<O> implements StepProvider<O> {
     }
 
     @Override
-    public Fitter<O> fitter() {
+    public Fitter<F, O> fitter() {
         return fitter;
     }
 
@@ -60,7 +64,12 @@ public class BasicStepProvider<O> implements StepProvider<O> {
     }
 
     @Override
-    public Optimizer<O> optimizer() {
+    public Optimizer<F, O> optimizer() {
         return optimizer;
+    }
+
+    @Override
+    public Goal goal() {
+        return goal;
     }
 }

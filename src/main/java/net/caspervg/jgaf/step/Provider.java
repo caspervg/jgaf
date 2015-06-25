@@ -1,13 +1,17 @@
 package net.caspervg.jgaf.step;
 
+import net.caspervg.jgaf.Goal;
 import net.caspervg.jgaf.Optimizer;
+
+import java.util.Comparator;
 
 /**
  * Provides strategies for all the steps in a genetic algorithm.
  *
+ * @param <F> Type of the fitness
  * @param <O> Type of the organism
  */
-public interface StepProvider<O> {
+public interface Provider<F extends Number & Comparable, O> {
 
     /**
      * Provides a {@link Creator}.
@@ -47,7 +51,7 @@ public interface StepProvider<O> {
      *
      * @return Fitter for organisms
      */
-    Fitter<O> fitter();
+    Fitter<F, O> fitter();
 
     /**
      * Provides a {@link Selector}.
@@ -63,5 +67,12 @@ public interface StepProvider<O> {
      *
      * @return Optimizer for organisms
      */
-    Optimizer<O> optimizer();
+    Optimizer<F, O> optimizer();
+
+    /**
+     * Provides a {@link Goal} for the Genetic Algorithm (for example: maximisation)
+     *
+     * @return Goal for the genetic algorithm
+     */
+    Goal goal();
 }
