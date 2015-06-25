@@ -5,10 +5,11 @@ package net.caspervg.jgaf;
  *
  * @param <O> Type of the organism
  */
-public class Solution<O> {
-    Number bestFitness;
-    O bestOrganism;
-    Population<O> finalPopulation;
+public class Solution<O extends Organism> {
+
+    private Number bestFitness;
+    private O bestOrganism;
+    private Population<O> finalPopulation;
 
     /**
      * Creates a new solution with given best fitness, best organism and final population

@@ -1,6 +1,7 @@
 package net.caspervg.jgaf.step;
 
 import net.caspervg.jgaf.Arguments;
+import net.caspervg.jgaf.Organism;
 import net.caspervg.jgaf.Population;
 
 /**
@@ -9,7 +10,7 @@ import net.caspervg.jgaf.Population;
  * @param <O> Type of the organism
  */
 @FunctionalInterface
-public interface Creator<O> {
+public interface Creator<O extends Organism<O, F>, F extends Number & Comparable> {
 
     /**
      * Creates an initial population for the genetic algorithm.

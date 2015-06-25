@@ -2,8 +2,7 @@ package net.caspervg.jgaf.step;
 
 import net.caspervg.jgaf.Goal;
 import net.caspervg.jgaf.Optimizer;
-
-import java.util.Comparator;
+import net.caspervg.jgaf.Organism;
 
 /**
  * Provides strategies for all the steps in a genetic algorithm.
@@ -11,7 +10,7 @@ import java.util.Comparator;
  * @param <F> Type of the fitness
  * @param <O> Type of the organism
  */
-public interface Provider<F extends Number & Comparable, O> {
+public interface Provider<O extends Organism<O, F>, F extends Number & Comparable> {
 
     /**
      * Provides a {@link Creator}.
@@ -19,47 +18,7 @@ public interface Provider<F extends Number & Comparable, O> {
      *
      * @return Creator for the initial population
      */
-    Creator<O> creator();
-
-    /**
-     * Provides a {@link Breeder}.
-     * This is used to breed organisms and perform possible crossovers.
-     *
-     * @return Breeder for the population
-     */
-    Breeder<O> breeder();
-
-    /**
-     * Provides a {@link Mutator}.
-     * This is used to mutate organisms.
-     *
-     * @return Mutator for organisms
-     */
-    Mutator<O> mutator();
-
-    /**
-     * Provides a {@link Killer}.
-     * This is used to kill organisms.
-     *
-     * @return Killer for the population
-     */
-    Killer<O> killer();
-
-    /**
-     * Provides a {@link Fitter}.
-     * This is used to calculate the fitness of an organism.
-     *
-     * @return Fitter for organisms
-     */
-    Fitter<F, O> fitter();
-
-    /**
-     * Provides a {@link Selector}.
-     * This is used to select which organism(s) are picked for breeding and death.
-     *
-     * @return Selector for organisms
-     */
-    Selector<O> selector();
+    Creator<O, F> creator();
 
     /**
      * Provides a {@link Optimizer}
@@ -67,7 +26,7 @@ public interface Provider<F extends Number & Comparable, O> {
      *
      * @return Optimizer for organisms
      */
-    Optimizer<F, O> optimizer();
+    Optimizer<O, F> optimizer();
 
     /**
      * Provides a {@link Goal} for the Genetic Algorithm (for example: maximisation)

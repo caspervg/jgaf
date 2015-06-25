@@ -2,17 +2,17 @@ package net.caspervg.jgaf.step.selector;
 
 import net.caspervg.jgaf.Arguments;
 import net.caspervg.jgaf.Goal;
+import net.caspervg.jgaf.Organism;
 import net.caspervg.jgaf.Population;
-import net.caspervg.jgaf.step.Fitter;
+import net.caspervg.jgaf.population.ListPopulation;
 
 import java.util.*;
 
-public class TournamentSelector<O> extends AbstractSelector<O> {
+public class TournamentSelector<O extends Organism> extends AbstractSelector<O> {
 
     private int tournamentSize;
 
-    public TournamentSelector(Fitter<?, O> fitter, int tournamentSize) {
-        super(fitter);
+    public TournamentSelector(int tournamentSize) {
         this.tournamentSize = tournamentSize;
     }
 
@@ -22,7 +22,7 @@ public class TournamentSelector<O> extends AbstractSelector<O> {
 
         List<O> selected = new ArrayList<>(arguments.breedingPoolSize());
         for (int i = 0; i < arguments.breedingPoolSize(); i++) {
-            int tournamentWinnerIndex = doTournament(organisms, goal);
+            int tournamentWinnerIndex = doTournament(organisms, arguments.goal());
             selected.add(organisms.get(tournamentWinnerIndex));
             organisms.remove(tournamentWinnerIndex);    // No double selections
         }
@@ -42,7 +42,7 @@ public class TournamentSelector<O> extends AbstractSelector<O> {
         int bestParticipantIndex = -1;
         for (Integer index : participantIndices) {
             O participant = organisms.get(index);
-            double participantFitness = fitter.calculate(participant).doubleValue();
+            double participantFitness = participant.fitness().doubleValue();
             if (goal.better(participantFitness, bestParticipantFitness)) {
                 bestParticipantFitness = participantFitness;
                 bestParticipantIndex = index;

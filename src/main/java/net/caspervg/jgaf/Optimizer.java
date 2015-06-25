@@ -1,27 +1,23 @@
 package net.caspervg.jgaf;
 
-import net.caspervg.jgaf.step.Fitter;
-
 import java.util.Comparator;
 
-public class Optimizer<F extends Number & Comparable, O> implements Comparator<O> {
+public class Optimizer<O extends Organism<O, F>, F extends Number & Comparable> implements Comparator<O> {
 
-    private Fitter<F, O> fitter;
     private Goal goal;
 
     private Optimizer() {
-        // We need a fitter and a goal
+        // We need a goal
     }
 
-    public Optimizer(Fitter<F, O> fitter, Goal goal) {
-        this.fitter = fitter;
+    public Optimizer(Goal goal) {
         this.goal = goal;
     }
 
     @Override
     public int compare(final O org1, final O org2) {
-        F fitness1 = fitter.calculate(org1);
-        F fitness2 = fitter.calculate(org2);
+        F fitness1 = org1.fitness();
+        F fitness2 = org2.fitness();
         return goal.compare(fitness1, fitness2);
     }
 

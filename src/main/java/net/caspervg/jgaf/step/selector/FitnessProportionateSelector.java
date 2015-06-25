@@ -2,17 +2,13 @@ package net.caspervg.jgaf.step.selector;
 
 import net.caspervg.jgaf.Arguments;
 import net.caspervg.jgaf.Goal;
+import net.caspervg.jgaf.Organism;
 import net.caspervg.jgaf.Population;
-import net.caspervg.jgaf.step.Fitter;
-import net.caspervg.jgaf.step.Selector;
+import net.caspervg.jgaf.population.ListPopulation;
 
 import java.util.*;
 
-public class FitnessProportionateSelector<O> extends AbstractSelector<O> {
-
-    public FitnessProportionateSelector(Fitter<?, O> fitter) {
-        super(fitter);
-    }
+public class FitnessProportionateSelector<O extends Organism> extends AbstractSelector<O> {
 
     /**
      * {@inheritDoc}
@@ -25,6 +21,7 @@ public class FitnessProportionateSelector<O> extends AbstractSelector<O> {
      *
      * @param arguments {@inheritDoc}
      * @param population {@inheritDoc}
+     * @param goal {@inheritDoc}
      * @return {@inheritDoc}
      */
     @Override

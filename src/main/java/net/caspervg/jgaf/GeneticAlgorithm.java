@@ -9,16 +9,15 @@ import java.util.Collection;
  *
  * @param <O> Type of the organism
  */
-public interface GeneticAlgorithm<O> {
+@FunctionalInterface
+public interface GeneticAlgorithm<O extends Organism<O, ?>> {
 
     /**
-     * Runs the genetic algorithm using given arguments and strategy provider
+     * Runs the genetic algorithm
      *
-     * @param arguments Arguments to use for the execution
-     * @param provider Strategy providers for the various steps
      * @return Solution object containing the best organism, the best fitness and the final population
      */
-    Solution<O> run(Arguments arguments, Provider<?, O> provider);
+    Solution<O> run();
 
     /**
      * Default implementation of a genetic algorithm.
@@ -38,40 +37,57 @@ public interface GeneticAlgorithm<O> {
      *
      * @param <O> Type of the organism
      */
-    class Default<O> implements GeneticAlgorithm<O> {
+    class Default<O extends Organism<O, ?>> implements GeneticAlgorithm<O> {
+
+        private Arguments arguments;
+        private Provider<O, ?> provider;
+
+        /**
+         * Creates a new Default {@link GeneticAlgorithm}
+         *
+         * @param arguments Arguments to use for the processing
+         * @param provider Provider to use for step injection
+         */
+        public Default(Arguments arguments, Provider<O, ?> provider) {
+            this.arguments = arguments;
+            this.provider = provider;
+        }
 
         /**
          * {@inheritDoc}
          * <p>
-         *     Runs the default genetic algorithm. See {@link net.caspervg.jgaf.GeneticAlgorithm.Default} for the
-         *     algorithm used.
+         *     Runs the default genetic algorithm.
+         *
+         *     The algorithm used in this implementation is:
+         *     <ol>
+         *         <li>Create an initial population</li>
+         *         <li>While there are still iterations to go
+         *         <ol>
+         *             <li>Breed children from a selection of the population</li>
+         *             <li>Mutate the children that were bred</li>
+         *             <li>Add the children to the population</li>
+         *             <li>Kill a selection of the population</li>
+         *         </ol>
+         *         <li>Find the best organism and return the solution</li>
+         *     </ol>
          * </p>
          *
-         * @param arguments {@inheritDoc}
-         * @param provider {@inheritDoc}
          * @return {@inheritDoc}
          */
         @Override
-        public Solution<O> run(Arguments arguments, Provider<?, O> provider) {
+        public Solution<O> run() {
             int iterations = 0;
             Population<O> population = provider.creator().create(arguments);
 
             while (iterations < arguments.numIterations()) {
-                Collection<O> parents = provider.selector().select(arguments, population, arguments.goal());
-                Collection<O> children = provider.breeder().breed(arguments, population, parents);
-                children = provider.mutator().mutate(arguments, children);
-
-                population.addAll(children);
-
-                Collection<O> conscripted = provider.selector().select(arguments, population, arguments.goal().opposite());
-                population = provider.killer().kill(arguments, population, conscripted);
-
+                population.breed(arguments);
+                population.kill(arguments);
                 iterations++;
             }
 
 
             O bestOrganism = population.getAll().stream().max(provider.optimizer()).get();
-            Number bestFitness = provider.fitter().calculate(bestOrganism);
+            Number bestFitness = bestOrganism.fitness();
             return new Solution<>(
                     bestFitness,
                     bestOrganism,
