@@ -4,5 +4,7 @@ jdk:
 os:
   - linux
   - osx
+install:
+ - mvn clean install -Ptest -DskipTests=true
 script:
- - mvn test -Prelease -B
+ - mvn test -Ptest
