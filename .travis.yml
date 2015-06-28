@@ -4,4 +4,5 @@ jdk:
 os:
   - linux
   - osx
-script: "mvn clean test -Prelease"
+script:
+ - mvn test -Prelease -B
